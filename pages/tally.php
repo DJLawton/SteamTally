@@ -10,42 +10,58 @@
       <?php
       if (isset($_GET['steamid'])) {
         try {
-          $userSummary = getUserSummary($_GET['steamid']);
-
-          //User info
-          echo '<img src="' . $userSummary['avatarfull'] . '" alt="User avatar" width="184" height="184"/>';
-          echo '<h2>Username : ' . $userSummary['personaname'] . '</h2>';
-          echo '<h4>Profile visibility : ' . PRIVACYLEVELS[$userSummary['communityvisibilitystate']] . '</h4>';
-          $sortedUserApps = getSortedUserApps($_GET['steamid']);
-          //Total hours
-          $totalPlaytimeInMinutes = array_sum(array_column($sortedUserApps, 'playtime'));
-          $playtimesHours = floor($totalPlaytimeInMinutes / 60);
-          $playtimesMinutes = $totalPlaytimeInMinutes - $playtimesHours * 60;
-          echo '<h4>TOTAL TIME : ' . $playtimesHours . 'h ' . $playtimesMinutes . 'm</h4>';
-
-          //Sorted list of hours
-          echo '<div class="list-group list-group-flush">';
-          foreach ($sortedUserApps as $appInfo) {
-            $playtimeHours = floor($appInfo['playtime'] / 60);
-            $playtimeMinutes = $appInfo['playtime'] - $playtimeHours * 60;
-      ?>
-            <div class="list-group-item p-0">
-              <div class="d-flex w-100 justify-content-between">
-                <div>
-                  <img src="http://media.steampowered.com/steamcommunity/public/images/apps/<?php echo $appInfo['appid']; ?>/<?php echo $appInfo['icon_url']; ?>.jpg" width="24" height="24">
+          $userSummary = getUserSummary($_GET['steamid']); ?>
+          <div class="text-center">
+            <img src="<?php echo $userSummary['avatarfull']; ?>" alt="User avatar" width="184" height="184" />
+            <h2>Username : <?php echo $userSummary['personaname']; ?></h2>
+            <h4>Profile visibility : <?php echo PRIVACYLEVELS[$userSummary['communityvisibilitystate']]; ?></h4>
+            <?php
+            //Total hours
+            $sortedUserApps = getSortedUserApps($_GET['steamid']);
+            $totalPlaytimeInMinutes = array_sum(array_column($sortedUserApps, 'playtime_forever'));
+            $playtimesHours = floor($totalPlaytimeInMinutes / 60);
+            $playtimesMinutes = $totalPlaytimeInMinutes - $playtimesHours * 60;
+            ?>
+            <h4>TOTAL TIME : <?php echo $playtimesHours; ?>h <?php echo $playtimesMinutes; ?>m</h4>
+          </div>
+          <div>
+            <?php
+            //Sorted list of hours
+            foreach ($sortedUserApps as $appInfo) {
+              //Forever
+              $playtimeForeverHours = floor($appInfo['playtime_forever'] / 60);
+              $playtimeForeverMinutes = $appInfo['playtime_forever'] - $playtimeForeverHours * 60;
+              //Recent
+              $playtimeRecentHours = floor($appInfo['playtime_2weeks'] / 60);
+              $playtimeRecentMinutes = $appInfo['playtime_2weeks'] - $playtimeRecentHours * 60;
+            ?>
+              <div class="row border-bottom <?php if ($appInfo['playtime_2weeks'] > 0) echo 'border-success'; ?>">
+                <div class="col-lg-10 col-md-8 col-12 p-0">
+                  <?php if ($appInfo['icon_url'] != "")
+                    echo '<img src="http://media.steampowered.com/steamcommunity/public/images/apps/' . $appInfo['appid'] . '/' . $appInfo['icon_url'] . '.jpg" width="24" height="24">';
+                  ?>
                   <span><?php echo $appInfo['name']; ?></span>
                 </div>
-                <span><?php echo $playtimeHours; ?>h <?php echo sprintf("%02d", $playtimeMinutes); ?>m</span>
+                <div class="col-lg-1 col-md-2 col-sm-10 col-8 p-0 text-end">
+                  <?php echo $playtimeForeverHours; ?>h <?php echo sprintf("%02d", $playtimeForeverMinutes); ?>m
+                </div>
+                <div class="col-lg-1 col-md-2 col-sm-2 col-4 p-0 text-end">
+
+                  <div class="text-success">
+                    <?php if ($appInfo['playtime_2weeks'] > 0) {
+                      echo $playtimeRecentHours . 'h ' . sprintf("%02d", $playtimeRecentMinutes) . 'm';
+                    } ?>
+                  </div>
+                </div>
               </div>
-            </div>
-      <?php
+          </div>
+    <?php
+            }
+          } catch (Exception $e) {
+            print($e);
           }
-          echo '</div>';
-        } catch (Exception $e) {
-          print($e);
         }
-      }
-      ?>
+    ?>
     </div>
   </main>
   <?php
