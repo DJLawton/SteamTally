@@ -56,11 +56,12 @@ function getSortedUserApps($steamid)
     array_push($slimedUserApps, array(
       'appid' => $appInfo['appid'],
       'name' => $appInfo['name'], 
-      'playtime' => $appInfo['playtime_forever'],
+      'playtime_2weeks' => isset($appInfo['playtime_2weeks']) ? $appInfo['playtime_2weeks'] : 0,
+      'playtime_forever' => $appInfo['playtime_forever'],
       'icon_url' => $appInfo['img_icon_url']
     ));
   }
   //Sort according to playtime, descending
-  array_multisort(array_column($slimedUserApps, 'playtime'), SORT_DESC, $slimedUserApps);
+  array_multisort(array_column($slimedUserApps, 'playtime_forever'), SORT_DESC, $slimedUserApps);
   return $slimedUserApps;
 }

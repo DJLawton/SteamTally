@@ -18,7 +18,7 @@
           echo '<h4>Profile visibility : ' . PRIVACYLEVELS[$userSummary['communityvisibilitystate']] . '</h4>';
           $sortedUserApps = getSortedUserApps($_GET['steamid']);
           //Total hours
-          $totalPlaytimeInMinutes = array_sum(array_column($sortedUserApps, 'playtime'));
+          $totalPlaytimeInMinutes = array_sum(array_column($sortedUserApps, 'playtime_forever'));
           $playtimesHours = floor($totalPlaytimeInMinutes / 60);
           $playtimesMinutes = $totalPlaytimeInMinutes - $playtimesHours * 60;
           echo '<h4>TOTAL TIME : ' . $playtimesHours . 'h ' . $playtimesMinutes . 'm</h4>';
@@ -26,8 +26,8 @@
           //Sorted list of hours
           echo '<div class="list-group list-group-flush">';
           foreach ($sortedUserApps as $appInfo) {
-            $playtimeHours = floor($appInfo['playtime'] / 60);
-            $playtimeMinutes = $appInfo['playtime'] - $playtimeHours * 60;
+            $playtimeHours = floor($appInfo['playtime_forever'] / 60);
+            $playtimeMinutes = $appInfo['playtime_forever'] - $playtimeHours * 60;
       ?>
             <div class="list-group-item p-0">
               <div class="d-flex w-100 justify-content-between">
